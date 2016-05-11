@@ -17,7 +17,19 @@ class SimpleBuyTest : BrokerTest
 
     public override Task StartTest()
     {
-        SymbolScript.OpenPosition(PositionType.Long, OrderType.Market, 0, PositionSize);
+        try
+        {
+            var position = SymbolScript.OpenPosition(PositionType.Long, OrderType.Market, 0, PositionSize);
+            if (position.Error != null)
+            {
+                Assert.Fail(position.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            _taskCompletionSource.SetException(ex);
+        }
+
 
         return _taskCompletionSource.Task;
     }

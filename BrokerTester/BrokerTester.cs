@@ -32,6 +32,11 @@ public class MySymbolScript : MySymbolScriptBase
 	{
 		//  Add tests here
 	    _tests.Add(new SimpleBuyTest(this));
+
+        //  This test should fail
+        _tests.Add(new SimpleBuyTest(this) { PositionSize = -100});
+
+        _tests.Add(new SimpleBuyTest(this));
 	}
 
     void ProcessTests()
