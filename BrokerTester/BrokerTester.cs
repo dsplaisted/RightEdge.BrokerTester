@@ -139,8 +139,8 @@ public class MySymbolScript : MySymbolScriptBase
 class TestResult
 {
     public BrokerTest Test { get; set; }
-    public string TestName => Test.TestName;
+    public string TestName { get { return Test.TestName; } }
     public Exception Exception { get; set; }
-    public bool Passed => Exception == null;
+    public bool Passed { get { return Exception == null; } }
     
 }

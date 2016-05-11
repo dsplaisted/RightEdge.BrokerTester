@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +7,7 @@ using RightEdge.Common;
 
 abstract class BrokerTest
 {
-    public MySymbolScript SymbolScript { get; }
+    public MySymbolScript SymbolScript { get; private set; }
 
     protected BrokerTest(MySymbolScript symbolScript)
     {
@@ -18,13 +18,13 @@ abstract class BrokerTest
     public abstract void ProcessEvent(object @event);
 
     //  Default to use the class name as the test name, but allow overriding it
-    public virtual string TestName => this.GetType().FullName;
+    public virtual string TestName { get { return this.GetType().FullName; } }
 }
 
 class NewTickEvent
 {
-    public TickData Tick { get; }
-    public BarData PartialBar { get; }
+    public TickData Tick { get; private set; }
+    public BarData PartialBar { get; private set; }
 
     public NewTickEvent(TickData tick, BarData partialBar)
     {
@@ -35,7 +35,7 @@ class NewTickEvent
 
 class NewBarEvent
 {
-    public BarData Bar { get; }
+    public BarData Bar { get; private set; }
 
     public NewBarEvent(BarData bar)
     {
@@ -45,8 +45,8 @@ class NewBarEvent
 
 class OrderFilledEvent
 {
-    public Position Position { get; }
-    public Trade Trade { get; }
+    public Position Position { get; private set; }
+    public Trade Trade { get; private set; }
 
     public OrderFilledEvent(Position position, Trade trade)
     {
@@ -57,9 +57,9 @@ class OrderFilledEvent
 
 class OrderCancelledEvent
 {
-    public Position Position { get; }
-    public Order Order { get; }
-    public string Information { get; }
+    public Position Position { get; private set; }
+    public Order Order { get; private set; }
+    public string Information { get; private set; }
 
     public OrderCancelledEvent(Position position, Order order, string information)
     {
@@ -79,7 +79,7 @@ public class AssertFailedException : Exception
 
 public static class Assert
 {
-    public static void AreEqual<T>(T actual, T expected, string message = null)
+    public static void AreEqual<T>(T actual, T expected, string message)
     {
         bool success;
         if (expected == null)
@@ -95,11 +95,11 @@ public static class Assert
         {
             if (message == null)
             {
-                message = $"Assert Failed. Expected: '{expected}' Actual: '{actual}'";
+                message = string.Format("Assert Failed. Expected: '{0}' Actual: '{1}'", expected, actual);
             }
             else
             {
-                message = $"Assert Failed. Expected: '{expected}' Actual: '{actual}' {message}";
+                message = string.Format("Assert Failed. Expected: '{0}' Actual: '{1}' {2}", expected, actual, message);
             }
             throw new AssertFailedException(message);
         }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,10 +9,11 @@ class SimpleBuyTest : BrokerTest
 {
     TaskCompletionSource<bool> _taskCompletionSource = new TaskCompletionSource<bool>();
 
-    public int PositionSize { get; set; } = 100;
+    public int PositionSize { get; set; }
 
     public SimpleBuyTest(MySymbolScript symbolScript) : base(symbolScript)
     {
+		PositionSize = 100;
     }
 
     public override Task StartTest()
