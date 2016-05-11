@@ -68,3 +68,45 @@ class OrderCancelledEvent
         Information = information;
     }
 }
+
+public class AssertFailedException : Exception
+{
+    public AssertFailedException(string message) : base(message)
+    {
+        
+    }
+}
+
+public static class Assert
+{
+    public static void AreEqual<T>(T actual, T expected, string message = null)
+    {
+        bool success;
+        if (expected == null)
+        {
+            success = (actual == null);
+        }
+        else
+        {
+            success = expected.Equals(actual);
+        }
+
+        if (!success)
+        {
+            if (message == null)
+            {
+                message = $"Assert Failed. Expected: '{expected}' Actual: '{actual}'";
+            }
+            else
+            {
+                message = $"Assert Failed. Expected: '{expected}' Actual: '{actual}' {message}";
+            }
+            throw new AssertFailedException(message);
+        }
+    }
+
+    public static void Fail(string message)
+    {
+        throw new AssertFailedException(message);
+    }
+}
