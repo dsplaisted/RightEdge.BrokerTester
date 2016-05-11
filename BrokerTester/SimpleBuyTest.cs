@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -42,6 +42,7 @@ class SimpleBuyTest : BrokerTest
             if (@event is OrderFilledEvent)
             {
                 var orderFilled = (OrderFilledEvent) @event;
+                Assert.AreEqual(orderFilled.Trade.TransactionType, TransactionType.Buy, "Transaction type");
                 if (orderFilled.Trade.Order.OrderState == BrokerOrderState.Filled)
                 {
                     Assert.AreEqual(orderFilled.Trade.Order.Fills.Sum(f => f.Quantity), PositionSize, "Total fill size");
