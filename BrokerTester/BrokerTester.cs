@@ -31,7 +31,7 @@ public class MySymbolScript : MySymbolScriptBase
 	public override void Startup()
 	{
 		//  Add tests here
-
+	    _tests.Add(new SimpleBuyTest(this));
 	}
 
     void ProcessTests()
