@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -79,6 +79,11 @@ public class AssertFailedException : Exception
 
 public static class Assert
 {
+    public static void AreEqual<T>(T actual, T expected)
+    {
+        AreEqual<T>(actual, expected, null);
+    }
+
     public static void AreEqual<T>(T actual, T expected, string message)
     {
         bool success;

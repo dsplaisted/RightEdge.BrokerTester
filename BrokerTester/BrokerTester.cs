@@ -30,7 +30,10 @@ public class MySymbolScript : MySymbolScriptBase
 
 	public override void Startup()
 	{
-		//  Add tests here
+		//  Add tests
+
+	    _tests.Add(new ReversePositionTest(this) {BrokerSupportsPositionReversal = true});
+
 	    _tests.Add(new SimpleBuyTest(this));
 
         //  This test should fail

@@ -57,9 +57,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsyncBrokerTest.cs" />
     <Compile Include="BaseClasses.cs" />
     <Compile Include="BrokerTest.cs" />
     <Compile Include="BrokerTester.cs" />
+    <Compile Include="ReversePositionTest.cs" />
     <Compile Include="SimpleBuyTest.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
