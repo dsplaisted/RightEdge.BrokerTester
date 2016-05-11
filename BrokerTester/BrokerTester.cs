@@ -25,7 +25,7 @@ public class MySymbolScript : MySymbolScriptBase
     List<BrokerTest> _tests = new List<BrokerTest>();
     List<TestResult> _testResults = new List<TestResult>();
 
-    BrokerTest CurrentTest => _tests.FirstOrDefault();
+    BrokerTest _currentTest;
     Task _currentTestTask;
 
 	public override void Startup()
@@ -36,27 +36,29 @@ public class MySymbolScript : MySymbolScriptBase
 
     void ProcessTests()
     {
-        if (CurrentTest == null)
+        if (_currentTest == null && _tests.Count == 0)
         {
             return;
         }
 
-        if (_currentTestTask == null)
+        if (_currentTest == null)
         {
             //  Wait for positions from any previous test to be closed before starting the next test
             if (OpenPositions.Count == 0 && PendingPositions.Count == 0)
             {
-                OutputMessage("Starting test: " + CurrentTest.TestName);
-                _currentTestTask = CurrentTest.StartTest();
+                _currentTest = _tests[0];
+                _tests.RemoveAt(0);
+                OutputMessage("Starting test: " + _currentTest.TestName);
+                _currentTestTask = _currentTest.StartTest();
             }
         }
 
-        if (_currentTestTask != null)
+        if (_currentTest != null)
         {
             if (_currentTestTask.IsCompleted)
             {
                 TestResult result = new TestResult();
-                result.Test = CurrentTest;
+                result.Test = _currentTest;
                 if (_currentTestTask.IsCanceled)
                 {
                     result.Exception = new OperationCanceledException();
@@ -72,7 +74,7 @@ public class MySymbolScript : MySymbolScriptBase
                 }
 
                 _testResults.Add(result);
-                _tests.RemoveAt(0);
+                _currentTest = null;
                 _currentTestTask = null;
                 ReportResult(result);
 
@@ -96,9 +98,9 @@ public class MySymbolScript : MySymbolScriptBase
 
     public override void NewTick(BarData partialBar, TickData tick)
     {
-        if (CurrentTest != null)
+        if (_currentTest != null)
         {
-            CurrentTest.ProcessEvent(new NewTickEvent(tick, partialBar));
+            _currentTest.ProcessEvent(new NewTickEvent(tick, partialBar));
         }
 
         ProcessTests();
@@ -106,25 +108,25 @@ public class MySymbolScript : MySymbolScriptBase
 
     public override void NewBar()
 	{
-        if (CurrentTest != null)
+        if (_currentTest != null)
         {
-            CurrentTest.ProcessEvent(new NewBarEvent(Bars.Current));
+            _currentTest.ProcessEvent(new NewBarEvent(Bars.Current));
         }
 	}
 
 	public override void OrderFilled(Position position, Trade trade)
 	{
-	    if (CurrentTest != null)
+	    if (_currentTest != null)
 	    {
-	        CurrentTest.ProcessEvent(new OrderFilledEvent(position, trade));
+	        _currentTest.ProcessEvent(new OrderFilledEvent(position, trade));
 	    }
 	}
 
 	public override void OrderCancelled(Position position, Order order, string information)
 	{
-	    if (CurrentTest != null)
+	    if (_currentTest != null)
 	    {
-	        CurrentTest.ProcessEvent(new OrderCancelledEvent(position, order, information));
+	        _currentTest.ProcessEvent(new OrderCancelledEvent(position, order, information));
 	    }
 	}
 }
