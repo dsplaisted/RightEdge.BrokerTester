@@ -40,32 +40,45 @@ public class MySymbolScript : MySymbolScriptBase
         {
             return;
         }
+
         if (_currentTestTask == null)
         {
-            _currentTestTask = CurrentTest.StartTest();
+            //  Wait for positions from any previous test to be closed before starting the next test
+            if (OpenPositions.Count == 0 && PendingPositions.Count == 0)
+            {
+                OutputMessage("Starting test: " + CurrentTest.TestName);
+                _currentTestTask = CurrentTest.StartTest();
+            }
         }
-        if (_currentTestTask.IsCompleted)
-        {
-            TestResult result = new TestResult();
-            result.Test = CurrentTest;
-            if (_currentTestTask.IsCanceled)
-            {
-                result.Exception = new OperationCanceledException();
-            }
-            else if (_currentTestTask.IsFaulted)
-            {
-                result.Exception = _currentTestTask.Exception;
-                while (result.Exception is AggregateException &&
-                       ((AggregateException) result.Exception).InnerExceptions.Count == 1)
-                {
-                    result.Exception = ((AggregateException) result.Exception).InnerExceptions[0];
-                }
-            }
 
-            _testResults.Add(result);
-            _tests.RemoveAt(0);
-            _currentTestTask = null;
-            ReportResult(result);
+        if (_currentTestTask != null)
+        {
+            if (_currentTestTask.IsCompleted)
+            {
+                TestResult result = new TestResult();
+                result.Test = CurrentTest;
+                if (_currentTestTask.IsCanceled)
+                {
+                    result.Exception = new OperationCanceledException();
+                }
+                else if (_currentTestTask.IsFaulted)
+                {
+                    result.Exception = _currentTestTask.Exception;
+                    while (result.Exception is AggregateException &&
+                           ((AggregateException) result.Exception).InnerExceptions.Count == 1)
+                    {
+                        result.Exception = ((AggregateException) result.Exception).InnerExceptions[0];
+                    }
+                }
+
+                _testResults.Add(result);
+                _tests.RemoveAt(0);
+                _currentTestTask = null;
+                ReportResult(result);
+
+                //  Close any positions left open by the test
+                PositionManager.CloseAllPositions(Symbol);
+            }
         }
     }
 
